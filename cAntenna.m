@@ -8,11 +8,11 @@ classdef cAntenna
   end
 
   methods
-    function obj = cAntenna()
-      obj.x = 0;
-      obj.y = 0;
-      obj.z = 0;
-      obj.fGain = 1;
+    function obj = cAntenna(x, y, z, gain)
+      obj.x = x;
+      obj.y = y;
+      obj.z = z;
+      obj.fGain = gain;
     end
   end
 

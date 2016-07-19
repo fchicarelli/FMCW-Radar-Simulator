@@ -11,15 +11,14 @@ classdef cTarget
   end
 
   methods
-    function obj = cTarget(i)
-      obj.x = 100*i;
-      obj.y = 0;
-      obj.z = 0;
-      obj.vx = 15*i;
-      obj.vy = 0;
-      obj.vz = 0;
-
-      obj.rcs = 1;
+    function obj = cTarget(x, y, z, vx, vy, vz, rcs)
+      obj.x = x;
+      obj.y = y;
+      obj.z = z;
+      obj.vx = vx;
+      obj.vy = vy;
+      obj.vz = vz;
+      obj.rcs = rcs;
     end
   end
 end
