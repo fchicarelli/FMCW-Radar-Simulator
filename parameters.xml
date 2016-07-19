@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+  <bandwith>50e6</bandwith>
+  <sample_frequency>100e6</sample_frequency>
+  <carrier_frequency>10e9</carrier_frequency>
+
+  <observation_time>5e-3</observation_time>
+  <modulation_time>8e-6</modulation_time>
+
+  <number_of_targets>2</number_of_targets>
+
+  <cfar>13</cfar>
+
+  <targets>
+    <target1>
+      <x>100</x>
+      <y>0</y>
+      <z>0</z>
+      <vx>15</vx>
+      <vy>0</vy>
+      <vz>0</vz>
+      <rcs>1</rcs>
+    </target1>
+    <target2>
+      <x>150</x>
+      <y>0</y>
+      <z>0</z>
+      <vx>20</vx>
+      <vy>0</vy>
+      <vz>0</vz>
+      <rcs>1</rcs>
+    </target2>
+  </targets>
+
+  <antennas>
+    <antenna1>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+      <gain>0</gain>
+    </antenna1>
+    <antenna2>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+      <gain>0</gain>
+    </antenna2>
+    <antenna3>
+      <x>0</x>
+      <y>0</y>
+      <z>0</z>
+      <gain>0</gain>
+    </antenna3>
+  </antennas>
+
+</parameters>
