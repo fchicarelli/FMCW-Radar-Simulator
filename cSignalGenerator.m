@@ -44,6 +44,10 @@ classdef cSignalGenerator
       afTxSignal = 100*cos(2*pi*param.fCarrierFreq*obj.afTime + ...
                         pi*param.fBandwith*(obj.afTimeN.^2)/param.fModTime);
 
+      phi = (param.fCarrierFreq - param.fBandwith/2)*obj.afTimeN + ...
+                param.fBandwith * (obj.afTimeN.^2) / (2*param.fModTime);
+      afTxSignal = exp(j*2*pi*phi);
+
       end
 
     function afRxSignal = generateRxSignal(obj, param, targetNum, antennaNum)
@@ -65,12 +69,14 @@ classdef cSignalGenerator
       z = param.targets(targetNum).z + obj.afTime * param.targets(targetNum).vz;
       afRange = sqrt((x - antenna.x).^2 + (y - antenna.y).^2 + (z - antenna.z).^2);
 
-      % TODO: Calcular a velocidade radial certa
-      fSpeed = param.targets(targetNum).vx;
 
       afDelay = 2*afRange/param.c;
       afRxSignal = 100*(1./(afRange.^0)) .* cos(2*pi*param.fCarrierFreq*(obj.afTime-afDelay) + ...
         pi*param.fBandwith*mod(obj.afTime-afDelay, param.fModTime).^2/param.fModTime);
+
+      phi = (param.fCarrierFreq - param.fBandwith/2)*mod(obj.afTimeN-afDelay, param.fModTime) + ...
+                param.fBandwith * (mod(obj.afTimeN-afDelay, param.fModTime).^2) / (2*param.fModTime);
+      afRxSignal = exp(j*2*pi*phi);
 
     end
   end

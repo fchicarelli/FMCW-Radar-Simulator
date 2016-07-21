@@ -18,16 +18,15 @@ classdef cProcessing
     miMaskInf
     miMaskSup
 
-    afRangesDetected
-    afSpeedsDetected
+    aTargetsDetectedInf
 
   end
 
   methods
     function obj = cProcessing(param, sg)
       % Mixing Signals
-      obj.afMixedSignalSup = sg.afTxSignal .* sg.afRxSignalSup;
-      obj.afMixedSignalInf = sg.afTxSignal .* sg.afRxSignalInf;
+      obj.afMixedSignalSup = sg.afTxSignal .* conj(sg.afRxSignalSup);
+      obj.afMixedSignalInf = sg.afTxSignal .* conj(sg.afRxSignalInf);
 
       obj = obj.lowPassFilter(param);
       obj = obj.computeFfts(param);
@@ -76,7 +75,7 @@ classdef cProcessing
     end
 
 
-    function obj =  cfar(obj, param)
+    function obj = cfar(obj, param)
       obj.mfSnrInf = zeros(param.iNumOfMod, param.iPointsPerMod);
       obj.mfSnrSup = zeros(param.iNumOfMod, param.iPointsPerMod);
       obj.miMaskInf = zeros(param.iNumOfMod, param.iPointsPerMod);
@@ -84,14 +83,15 @@ classdef cProcessing
 
       fNoiseLevel = mean(abs(obj.mcFftsInf(1,:)));
       afSnr = abs(obj.mcFftsInf(1,:)) / fNoiseLevel;
-      [dummy iPeaks] = findpeaks(afSnr, 'MinPeakHeight', param.fCFAR);
+      [dummy iPeaksInf] = findpeaks(afSnr, 'MinPeakHeight', param.fCFAR);
 
-      for j=1:size(iPeaks,2)
-          fNoiseLevel = mean(abs(obj.mcFftsFinalInf(:,iPeaks(j))));
-          afSnr = abs(obj.mcFftsFinalInf(:,iPeaks(j))) / fNoiseLevel;
+      for j=1:size(iPeaksInf,2)
+          fNoiseLevel = mean(abs(obj.mcFftsFinalInf(:,iPeaksInf(j))));
+          afSnr = abs(obj.mcFftsFinalInf(:,iPeaksInf(j))) / fNoiseLevel;
           [dummy iPeaks2] = findpeaks(afSnr, 'MinPeakHeight', param.fCFAR);
-          obj.miMaskInf(iPeaks2, iPeaks(j)) = 1;
+          obj.miMaskInf(iPeaks2, iPeaksInf(j)) = 1;
       end
+
     end
 
 
@@ -104,8 +104,8 @@ classdef cProcessing
         fSpeed = obj.computeSpeed(param, indFd(i));
 
         if fRange > 0
-          obj.afRangesDetected = [obj.afRangesDetected fRange];
-          obj.afSpeedsDetected = [obj.afSpeedsDetected fSpeed];
+          obj.aTargetsDetectedInf(size(obj.aTargetsDetectedInf,2)+1).range = fRange;
+          obj.aTargetsDetectedInf(size(obj.aTargetsDetectedInf,2)).speed = fSpeed;
         end
       end
     end
@@ -129,11 +129,12 @@ classdef cProcessing
       xlabel('Range (m)')
       ylabel('Speed (m/s)');
       title('Targets');
-      
+
       disp(['=== Targets simulated ===']);
       for i=1:param.iNumOfTargets
         fRange = sqrt(param.targets(i).x^2+param.targets(i).y^2+param.targets(i).z^2);
-        fSpeed = sqrt(param.targets(i).vx^2+param.targets(i).vy^2+param.targets(i).vz^2);
+        % TODO: Fix speed calculation
+        fSpeed = param.targets(i).vx+param.targets(i).vy+param.targets(i).vz;
         disp(['Target #', num2str(i), ': Range = ', num2str(fRange), ...
                   'm  Speed = ', num2str(fSpeed), 'm/s']);
 
@@ -142,10 +143,10 @@ classdef cProcessing
 
       disp('')
       disp(['=== Targets detected ===']);
-      for i=1:size(obj.afRangesDetected, 2)
-        disp(['Target #', num2str(i), ': Range = ', num2str(obj.afRangesDetected(i)), ...
-                  'm  Speed = ', num2str(obj.afSpeedsDetected(i)), 'm/s']);
-        plot(obj.afRangesDetected(i), obj.afSpeedsDetected(i), 'r.');
+      for i=1:size(obj.aTargetsDetectedInf, 2)
+        disp(['Target #', num2str(i), ': Range = ', num2str(obj.aTargetsDetectedInf(i).range), ...
+                  'm  Speed = ', num2str(obj.aTargetsDetectedInf(i).speed), 'm/s']);
+        plot(obj.aTargetsDetectedInf(i).range, obj.aTargetsDetectedInf(i).speed, 'r.');
       end
 
     end
