@@ -31,15 +31,14 @@ classdef cSignalGenerator
           obj.afRxSignalInf = obj.afRxSignalInf + obj.generateRxSignal(param, i, 1);
         end
       end
-
     end
+
 
     function afTxSignal = generateTxSignal(obj, param)
       % Creating the transmited signal
       % TODO: Add noise
       % TODO: Add antenna gain
       % TODO: Add antenna diagram
-      % TODO: Transform the chirp to complex
       % TODO: Add more than one modulation
       afTxSignal = 100*cos(2*pi*param.fCarrierFreq*obj.afTime + ...
                         pi*param.fBandwith*(obj.afTimeN.^2)/param.fModTime);
@@ -48,7 +47,8 @@ classdef cSignalGenerator
                 param.fBandwith * (obj.afTimeN.^2) / (2*param.fModTime);
       afTxSignal = exp(j*2*pi*phi);
 
-      end
+    end
+
 
     function afRxSignal = generateRxSignal(obj, param, targetNum, antennaNum)
       % TODO: Add noise
@@ -78,6 +78,20 @@ classdef cSignalGenerator
                 param.fBandwith * (mod(obj.afTimeN-afDelay, param.fModTime).^2) / (2*param.fModTime);
       afRxSignal = exp(j*2*pi*phi);
 
+      % Adding noise to the signal
+      afRxSignal = afRxSignal + obj.generateThermalNoise(param);
     end
+
+
+    function acRuido = generateThermalNoise(obj, param)
+      % TODO: Confirm the calculations here
+      % Create the guassian white noise
+      acRuido = exp(2*j*pi*rand(size(obj.afTime)));
+
+      % Multipling by the amplitude of the thermal noise
+      fPower = param.k*param.fNoiseTemperature*param.fBandwith*param.fNoiseFigure;
+      acRuido = sqrt(fPower) * acRuido;
+    end
+
   end
 end

@@ -6,6 +6,7 @@ classdef cParameters
 
     % Constants
     c
+    k
 
     % Frequencies
     fBandwith
@@ -27,7 +28,11 @@ classdef cParameters
     antennaRxSup
     antennaRxInf
 
-    %
+    % Noise
+    fNoiseTemperature
+    fNoiseFigure
+
+    % Detection
     fCFAR
 
   end
@@ -38,6 +43,7 @@ classdef cParameters
       obj.xmlDoc = xml2struct(obj.sConfigFile);
 
       obj.c = 3e8;
+      obj.k = 1.38e-23;
 
       obj.fBandwith = str2num(obj.extractDataXml({'bandwith'}));
       obj.fSampleFreq = str2num(obj.extractDataXml({'sample_frequency'}));
@@ -81,6 +87,11 @@ classdef cParameters
         str2num(obj.extractDataXml({'antennas', 'antenna3', 'z'})), ...
         str2num(obj.extractDataXml({'antennas', 'antenna3', 'gain'})) ...
       );
+
+
+      obj.fNoiseTemperature = str2num(obj.extractDataXml({'noise_temperature'}));
+      obj.fNoiseFigure = str2num(obj.extractDataXml({'noise_figure'}));
+      obj.fNoiseFigure = 10^(obj.fNoiseFigure/10.);
 
       obj.fCFAR = str2num(obj.extractDataXml({'cfar'}));
 
