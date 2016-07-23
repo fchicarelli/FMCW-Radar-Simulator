@@ -13,6 +13,9 @@ classdef cParameters
     fSampleFreq
     fCarrierFreq
 
+    % Power
+    fTransmittedPower
+
     % Periods
     fObsTime
     fModTime
@@ -49,6 +52,8 @@ classdef cParameters
       obj.fSampleFreq = str2num(obj.extractDataXml({'sample_frequency'}));
       obj.fCarrierFreq = str2num(obj.extractDataXml({'carrier_frequency'}));
 
+      obj.fTransmittedPower = str2num(obj.extractDataXml({'transmitted_power'}));
+
       obj.fObsTime = str2num(obj.extractDataXml({'observation_time'}));
       obj.fModTime = str2num(obj.extractDataXml({'modulation_time'}));
       obj.iNumOfMod = floor(obj.fObsTime / obj.fModTime);
@@ -69,23 +74,31 @@ classdef cParameters
         )];
       end
 
+      fGainDB = str2num(obj.extractDataXml({'antennas', 'antenna1', 'gain'}));
+      fGainLinear = 10^(fGainDB/10.);
       obj.antennaTx = cAntenna( ...
         str2num(obj.extractDataXml({'antennas', 'antenna1', 'x'})), ...
         str2num(obj.extractDataXml({'antennas', 'antenna1', 'y'})), ...
         str2num(obj.extractDataXml({'antennas', 'antenna1', 'z'})), ...
-        str2num(obj.extractDataXml({'antennas', 'antenna1', 'gain'})) ...
+        fGainLinear ...
       );
+
+      fGainDB = str2num(obj.extractDataXml({'antennas', 'antenna2', 'gain'}));
+      fGainLinear = 10^(fGainDB/10.);
       obj.antennaRxSup = cAntenna( ...
         str2num(obj.extractDataXml({'antennas', 'antenna2', 'x'})), ...
         str2num(obj.extractDataXml({'antennas', 'antenna2', 'y'})), ...
         str2num(obj.extractDataXml({'antennas', 'antenna2', 'z'})), ...
-        str2num(obj.extractDataXml({'antennas', 'antenna2', 'gain'})) ...
+        fGainLinear ...
       );
+
+      fGainDB = str2num(obj.extractDataXml({'antennas', 'antenna3', 'gain'}));
+      fGainLinear = 10^(fGainDB/10.);
       obj.antennaRxInf =  cAntenna( ...
         str2num(obj.extractDataXml({'antennas', 'antenna3', 'x'})), ...
         str2num(obj.extractDataXml({'antennas', 'antenna3', 'y'})), ...
         str2num(obj.extractDataXml({'antennas', 'antenna3', 'z'})), ...
-        str2num(obj.extractDataXml({'antennas', 'antenna3', 'gain'})) ...
+        fGainLinear ...
       );
 
 
@@ -96,6 +109,7 @@ classdef cParameters
       obj.fCFAR = str2num(obj.extractDataXml({'cfar'}));
 
     end
+
 
     function value = extractDataXml(obj, fields)
       xmlNode = obj.xmlDoc;
